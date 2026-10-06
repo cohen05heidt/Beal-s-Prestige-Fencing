@@ -20,7 +20,7 @@ To switch it off: repo **Settings → Pages →** set the branch to **None** →
 
 | Section | What it does |
 |---|---|
-| Opening | A Higgsfield film loops behind the headline as a boomerang: posts, rails and cedar boards go up around an empty backyard (about 5 seconds), then it rewinds and builds again. The first time the fence is finished, an orange "string line" pulls tight under *Craftsmanship.* Phones get a tall crop of the same film. Pause / play button bottom right. |
+| Opening | A Higgsfield time-lapse loops behind the headline: a crew lays out the fence line, sets posts, adds rails, boards it up and hangs the gate (about 10 seconds), the finished fence holds for 3 seconds, then it rewinds quickly and builds again. The first time the fence is finished, a cream "string line" pulls tight under *Craftsmanship.* Phones get a tall crop of the same film. Pause / play button bottom right. |
 | Promise strip | Family owned · 24/7 customer service · Residential & commercial · Free quotes · Hall & Jackson Counties. |
 | Services | Residential, commercial, gates & repairs, complete fence overhaul, storm & emergency service. |
 | Fence styles | All eight styles drawn as contractor elevation drawings: wood stockade, shadow box, board on board, 4 rail farm, cross buck farm, white vinyl, black aluminum, chain link. Aluminum and chain link have a **4 ft / 6 ft** switch that resizes the drawing. Every card has **Quote this style**, which jumps to the form with that style (and height) already picked. |
@@ -129,8 +129,8 @@ All of these are tokens at the top of `assets/css/style.css`.
 index.html                 the page
 assets/css/style.css       all styling
 assets/js/main.js          all interaction (vanilla JS)
-assets/video/hero-wide.mp4 opening film, desktop (1912x1080, 10 s boomerang loop, 3.9 MB)
-assets/video/hero-tall.mp4 opening film, phones (608x1080 centre crop, 1.2 MB)
+assets/video/hero-wide.mp4 opening film, desktop (1600x900, 15.6 s loop)
+assets/video/hero-tall.mp4 opening film, phones (608x1080 centre crop)
 assets/img/                film posters (first and last frame), share card, logo mark
 assets/img/work/           project photos (full size + small cover per type)
 preview-server.ps1         local preview server used by START-PREVIEW.bat
@@ -139,4 +139,11 @@ _src/                      full-size Higgsfield originals (not uploaded, ignored
 
 ## Graphics
 
-The opening film was generated with **Higgsfield**: GPT Image 2.5 for the "before" (empty yard) and "after" (fenced yard) stills of the same scene, then Kling 3.0 Pro animating between them as start and end frames. With ffmpeg it was sped up 2×, joined to a reversed copy of itself for the boomerang, and compressed to H.264. The house and yard are AI-generated, not a real property. Fence-style drawings are drawn in code. The **Our work** photos are the client's own jobs. No stock photos and no third-party logos are used.
+The opening film was generated with **Higgsfield** as a five-step build:
+
+1. A base drone-style photo of an empty backyard (FLUX 3).
+2. Five edits of that same photo, one per stage: layout stakes and string line, posts set in concrete, rails, boards on half the fence, finished fence with a double gate (Nano Banana 2.1). The boards copy the style of the client's real fence (IMG_3520, pressure-treated pine with dog-ear tops).
+3. Kling 3.0 Pro animated each stage into the next as a time-lapse with a small crew, five 5-second clips.
+4. With ffmpeg the clips were joined, sped up 2.5× (10-second build), given a 3-second hold on the finished fence and a quick 2.5-second rewind, then compressed to H.264.
+
+The stage stills are in `_src/gen2/` (`stage0-empty.png` … `stage5-finished.png`). The house, yard and crew are AI-generated, not a real property or real employees. Fence-style drawings are drawn in code. The **Our work** photos are the client's own jobs. No stock photos and no third-party logos are used.

@@ -37,9 +37,20 @@ while ($listener.IsListening) {
       $ext = [System.IO.Path]::GetExtension($path).ToLower()
       $ctx.Response.ContentType = if ($mime.ContainsKey($ext)) { $mime[$ext] } else { "application/octet-stream" }
       $ctx.Response.Headers["Cache-Control"] = "no-cache"
+      $ctx.Response.Headers["Accept-Ranges"] = "bytes"
       $bytes = [System.IO.File]::ReadAllBytes($path)
-      $ctx.Response.ContentLength64 = $bytes.Length
-      $ctx.Response.OutputStream.Write($bytes, 0, $bytes.Length)
+      $start = 0; $end = $bytes.Length - 1
+      # Byte ranges let browsers seek and loop the hero video, like a real web host does
+      $range = $ctx.Request.Headers["Range"]
+      if ($range -match '^bytes=(\d*)-(\d*)$') {
+        if ($Matches[1] -ne "") { $start = [int64]$Matches[1]; if ($Matches[2] -ne "") { $end = [Math]::Min([int64]$Matches[2], $end) } }
+        elseif ($Matches[2] -ne "") { $start = [Math]::Max(0, $bytes.Length - [int64]$Matches[2]) }
+        $ctx.Response.StatusCode = 206
+        $ctx.Response.Headers["Content-Range"] = "bytes $start-$end/$($bytes.Length)"
+      }
+      $len = $end - $start + 1
+      $ctx.Response.ContentLength64 = $len
+      $ctx.Response.OutputStream.Write($bytes, [int]$start, [int]$len)
     } else {
       $ctx.Response.StatusCode = 404
     }

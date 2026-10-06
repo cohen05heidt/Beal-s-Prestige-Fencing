@@ -66,8 +66,9 @@
       hero.classList.add('is-playing');
       setBtn('pause');
     });
-    const stringWhenBuilt = () => { // the fence is complete just before the halfway point
-      if (video.duration && video.currentTime >= video.duration / 2 - 0.35) {
+    const builtAt = Number(video.dataset.builtAt) || 0; // seconds into the loop when the fence is finished
+    const stringWhenBuilt = () => {
+      if (video.duration && video.currentTime >= (builtAt || video.duration / 2 - 0.35)) {
         hero.classList.add('is-strung');
         video.removeEventListener('timeupdate', stringWhenBuilt);
       }
