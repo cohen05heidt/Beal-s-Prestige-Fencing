@@ -84,9 +84,11 @@ p { margin: 0; }
 .nav {
   position: fixed; inset: 0 0 auto; z-index: 50; height: var(--nav-h);
   color: var(--cream);
-  transition: background-color .3s, box-shadow .3s;
+  background: var(--green); /* solid logo-green bar; the logo badge blends straight into it */
+  box-shadow: 0 1px 0 rgba(255,250,221,.14), 0 6px 22px rgba(0,34,0,.22);
+  transition: box-shadow .3s;
 }
-.nav.is-solid { background: var(--pine); box-shadow: 0 1px 0 rgba(255,250,221,.06), 0 10px 30px rgba(0,34,0,.18); }
+.nav.is-solid { box-shadow: 0 1px 0 rgba(255,250,221,.14), 0 10px 30px rgba(0,34,0,.3); }
 .nav-inner { height: 100%; display: flex; align-items: center; gap: 24px; width: min(1320px, 100% - 2 * var(--gutter)); margin-inline: auto; }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; flex: none; }
 .brand-mark { width: 52px; height: 52px; border-radius: 10px; }
@@ -144,13 +146,14 @@ p { margin: 0; }
   overflow: hidden;
 }
 .hero-media, .hero-shade { position: absolute; inset: 0; z-index: -2; }
+.hero-media { top: var(--nav-h); } /* film starts below the solid top bar */
 .hero-shade { z-index: -1; }
 .hero-poster, .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
 .hero-video { opacity: 0; transition: opacity .6s ease; }
 .hero.is-playing .hero-video { opacity: 1; }
 .hero-shade {
   background:
-    linear-gradient(180deg, rgba(0,34,0,.55) 0%, rgba(0,34,0,0) 22%),
+    linear-gradient(180deg, rgba(0,34,0,.35) 0%, rgba(0,34,0,0) 18%),
     linear-gradient(90deg, rgba(0,34,0,.86) 0%, rgba(0,34,0,.62) 34%, rgba(0,34,0,.12) 62%, rgba(0,34,0,0) 75%),
     linear-gradient(0deg, rgba(0,34,0,.55) 0%, rgba(0,34,0,0) 30%);
 }
