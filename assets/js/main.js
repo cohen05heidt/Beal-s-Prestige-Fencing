@@ -1,4 +1,4 @@
-/* Beals Prestige Fencing - all page interaction. Plain JavaScript, no libraries. */
+/* Beal’s Prestige Fencing - all page interaction. Plain JavaScript, no libraries. */
 (() => {
   'use strict';
 
@@ -429,7 +429,7 @@
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, from_name: 'Beals Prestige Fencing website', replyto: d.email || undefined, message: body }),
+        body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, from_name: 'Beal’s Prestige Fencing website', replyto: d.email || undefined, message: body }),
       });
       const out = await res.json();
       if (!res.ok || !out.success) throw new Error(out.message || res.status);

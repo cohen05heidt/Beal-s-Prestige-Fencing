@@ -1,6 +1,6 @@
-# Beals Prestige Fencing — website
+# Beal’s Prestige Fencing — website
 
-A single-page website for **Beals Prestige Fencing**, a family-owned fence company serving all of Hall County and Jackson County, Georgia. *Your Property. Your Privacy. Our Craftsmanship.*
+A single-page website for **Beal’s Prestige Fencing**, a family-owned fence company serving all of Hall County and Jackson County, Georgia. *Your Property. Your Privacy. Our Craftsmanship.*
 
 Plain HTML, CSS and JavaScript. No build step, no frameworks, no dependencies. It runs on any static host (GitHub Pages, Netlify, Cloudflare Pages, Hostinger, and so on).
 
@@ -95,7 +95,18 @@ All 67 photos, converted from iPhone HEIC to JPG, are in `_src/photos/jpg/` on t
 
 **Family / crew photo:** save it as `assets/img/about.jpg` (landscape) and it appears in the About section.
 
-**Logo:** the picket mark in `assets/img/mark.svg` is a stand-in. If the business has a logo, replace that file (square works best).
+**Logo:** the client's logo is `assets/img/logo.jpg` (original in `_src/logo-original.jpg`). It sits on its own green (#005200), so on the site's green sections it blends in with no visible box. `logo-160.jpg` is the top-bar size; `favicon-32.png`, `icon-192.png` and `apple-touch-icon.png` are the browser-tab and phone home-screen icons.
+
+## Brand (matches the logo)
+
+| | |
+|---|---|
+| Green | `#005200`, the logo's background. Top bar, dark sections, footer, and buttons on light sections. |
+| Cream | `#FFFADD`, the logo's lettering. Text and buttons on green. |
+| Headings and labels | **Trirong**, a classic Roman serif matching "PRESTIGE" in the logo. Headings at a light weight, small labels in spaced capitals. |
+| Body text | Hanken Grotesk, a plain sans for easy reading. |
+
+All of these are tokens at the top of `assets/css/style.css`.
 
 ## Before launch
 
