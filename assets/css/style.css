@@ -221,6 +221,24 @@ p { margin: 0; }
   .hero-play { bottom: 20px; }
 }
 
+/* Phones and portrait tablets: instead of cropping a narrow slice of the film to fill the
+   whole screen, show the yard zoomed out (a wide 10:9 cut) along the bottom of the hero,
+   fading up into the green behind the headline. */
+@media (orientation: portrait) and (max-width: 1024px) {
+  .hero {
+    --film-h: min(90vw, 64svh);
+    align-items: flex-start;
+    background: var(--green-ink);
+    padding-bottom: calc(var(--film-h) * .78);
+  }
+  .hero-media { top: auto; bottom: 0; height: var(--film-h); }
+  .hero-shade {
+    background:
+      linear-gradient(180deg, var(--green-ink) 0%, var(--green-ink) calc(100% - var(--film-h)), rgba(0,36,0,.6) calc(100% - var(--film-h) * .84), rgba(0,36,0,0) calc(100% - var(--film-h) * .52)),
+      linear-gradient(0deg, rgba(0,36,0,.3) 0%, rgba(0,36,0,0) 14%);
+  }
+}
+
 /* ---------- Promise strip ---------- */
 .promises { background: var(--pine); color: rgba(255,250,221,.86); }
 .promises-list {

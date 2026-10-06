@@ -19,9 +19,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Trirong:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="assets/img/hero-start.jpg?v=3" media="(min-width: 700px)">
-  <link rel="preload" as="image" href="assets/img/hero-start-sm.jpg?v=3" media="(max-width: 699px)">
-  <link rel="stylesheet" href="assets/css/style.css?v=6">
+  <link rel="preload" as="image" href="assets/img/hero-start.jpg?v=4" media="not all and (orientation: portrait) and (max-width: 1024px)">
+  <link rel="preload" as="image" href="assets/img/hero-start-sm.jpg?v=4" media="(orientation: portrait) and (max-width: 1024px)">
+  <link rel="stylesheet" href="assets/css/style.css?v=7">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <!-- Business details for Google -->
   <script type="application/ld+json">
@@ -88,12 +88,12 @@
     <section class="hero" id="top" aria-labelledby="heroTitle">
       <div class="hero-media" aria-hidden="true">
         <picture>
-          <source media="(max-width: 699px)" srcset="assets/img/hero-start-sm.jpg?v=3">
-          <img class="hero-poster" id="heroPoster" src="assets/img/hero-start.jpg?v=3" alt="" width="1920" height="1086">
+          <source media="(orientation: portrait) and (max-width: 1024px)" srcset="assets/img/hero-start-sm.jpg?v=4">
+          <img class="hero-poster" id="heroPoster" src="assets/img/hero-start.jpg?v=4" alt="" width="1920" height="1086">
         </picture>
         <video class="hero-video" id="heroVideo" muted playsinline preload="auto"
-               data-src-wide="assets/video/hero-wide.mp4?v=3" data-src-tall="assets/video/hero-tall.mp4?v=3" data-built-at="9.1"
-               data-end-wide="assets/img/hero-end.jpg?v=3" data-end-tall="assets/img/hero-end-sm.jpg?v=3"></video>
+               data-src-wide="assets/video/hero-wide.mp4?v=4" data-src-tall="assets/video/hero-portrait.mp4?v=4" data-built-at="6.0"
+               data-end-wide="assets/img/hero-end.jpg?v=4" data-end-tall="assets/img/hero-end-sm.jpg?v=4"></video>
       </div>
       <div class="hero-shade" aria-hidden="true"></div>
 
@@ -564,6 +564,6 @@
     <symbol id="i-storm" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M14 26h20a8 8 0 0 0 0-16 11 11 0 0 0-21 3 6.5 6.5 0 0 0 1 13z"/><path d="m25 26-5 8h7l-5 9"/></g></symbol>
   </svg>
 
-  <script src="assets/js/main.js?v=6" defer></script>
+  <script src="assets/js/main.js?v=7" defer></script>
 </body>
 </html>

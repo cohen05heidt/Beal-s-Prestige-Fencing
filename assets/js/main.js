@@ -41,7 +41,7 @@
   const poster = $('#heroPoster');
   const playBtn = $('#heroPlay');
   const playLabel = $('.hero-play-label', playBtn);
-  const tall = matchMedia('(max-width: 699px)').matches;
+  const tall = matchMedia('(orientation: portrait) and (max-width: 1024px)').matches; // phones and portrait tablets get the wide 10:9 cut
 
   const setBtn = (state) => { // 'pause' | 'paused'
     playBtn.hidden = false;
