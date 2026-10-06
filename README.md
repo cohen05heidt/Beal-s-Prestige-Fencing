@@ -25,7 +25,7 @@ To switch it off: repo **Settings → Pages →** set the branch to **None** →
 | Services | Residential, commercial, gates & repairs, complete fence overhaul, storm & emergency service. |
 | Fence styles | All eight styles drawn as contractor elevation drawings: wood stockade, shadow box, board on board, 4 rail farm, cross buck farm, white vinyl, black aluminum, chain link. Aluminum and chain link have a **4 ft / 6 ft** switch that resizes the drawing. Every card has **Quote this style**, which jumps to the form with that style (and height) already picked. |
 | About us | The family-owned story, plus a "Give us a call when…" list. |
-| Our work | Photo gallery. Until a photo exists, each slot shows that style's drawing and "Photo coming soon". Click a photo to view it large. |
+| Our work | Six tiles of the company's own work, one per fence type. Click a tile to flip through its 2–3 photos. |
 | Reviews | Review cards, a Google reviews badge, and a **Leave a Google review** banner. See *Reviews* below. |
 | Free quote | Short quote form, plus click-to-call, **Text a photo**, email, and service area. |
 
@@ -74,20 +74,24 @@ Real cards show everywhere, including the live domain.
 
 **Leave a Google review link:** in the Google Business Profile, choose **Ask for reviews** / **Get more reviews**, copy the short link (looks like `https://g.page/r/…/review`), and paste it as the button's `href` (search `Leave a Google review`). Until then the button opens a Google search for the business.
 
-## Adding the photos
+## Photos
 
-Drop photos into `assets/img/work/` with these exact names and they appear automatically (JPG, landscape, about 1600 px wide is plenty):
+The client sent 67 phone photos. The best 2–3 for each fence type are on the site; each **Our work** tile shows one cover photo, and clicking it opens that type's photos with previous / next arrows.
 
-| File name | Shows as |
+| Tile | Photos used (original file names) |
 |---|---|
-| `board-on-board.jpg` | Board on board |
-| `shadow-box.jpg` | Shadow box |
-| `white-vinyl.jpg` | White vinyl |
-| `chain-link-and-shadow-box.jpg` | 6 ft chain link & wood shadow box |
-| `wood-stockade.jpg` | Wood stockade |
-| `black-aluminum.jpg` | Black aluminum |
+| Board on board | IMG_3309 (cover), IMG_3520, IMG_3289 |
+| Shadow box | IMG_2544 (cover), IMG_3293, IMG_2547 |
+| White vinyl | IMG_3373 (cover), IMG_3366, IMG_3368 |
+| 6 ft chain link | IMG_3155 (cover), IMG_3157 |
+| Wood stockade | IMG_4557 (cover, cropped to leave out the trash cans), IMG_4562 |
+| Black aluminum | IMG_4574 (cover), IMG_4578, IMG_4577 |
 
-To add more photos, copy one `<figure class="work-tile">…</figure>` block in `index.html` (search for `Our work`), then change the file name, the `alt` text and the caption.
+None of the photos show chain link and shadow box on the same job (the dark fence next to the shadow box in IMG_3291 / IMG_3293 is black silt fence), so chain link has its own tile. Location data (GPS) was stripped from every photo.
+
+All 67 photos, converted from iPhone HEIC to JPG, are in `_src/photos/jpg/` on this computer (not uploaded) in case you want to swap any.
+
+**To add or swap a photo:** save it in `assets/img/work/` (about 1400 px on the long side is plenty), then add its path to the tile's `data-photos` list in `index.html` (search `Our work`). The first path in the list is the large version of the cover; the tile itself shows the `-1-sm.jpg` file.
 
 **Family / crew photo:** save it as `assets/img/about.jpg` (landscape) and it appears in the About section.
 
@@ -116,11 +120,11 @@ assets/js/main.js          all interaction (vanilla JS)
 assets/video/hero-wide.mp4 opening film, desktop (1912x1080, 10 s boomerang loop, 3.9 MB)
 assets/video/hero-tall.mp4 opening film, phones (608x1080 centre crop, 1.2 MB)
 assets/img/                film posters (first and last frame), share card, logo mark
-assets/img/work/           project photos
+assets/img/work/           project photos (full size + small cover per type)
 preview-server.ps1         local preview server used by START-PREVIEW.bat
 _src/                      full-size Higgsfield originals (not uploaded, ignored by git)
 ```
 
 ## Graphics
 
-The opening film was generated with **Higgsfield**: GPT Image 2.5 for the "before" (empty yard) and "after" (fenced yard) stills of the same scene, then Kling 3.0 Pro animating between them as start and end frames. With ffmpeg it was sped up 2×, joined to a reversed copy of itself for the boomerang, and compressed to H.264. The house and yard are AI-generated, not a real property. Fence-style drawings are drawn in code. No stock photos and no third-party logos are used.
+The opening film was generated with **Higgsfield**: GPT Image 2.5 for the "before" (empty yard) and "after" (fenced yard) stills of the same scene, then Kling 3.0 Pro animating between them as start and end frames. With ffmpeg it was sped up 2×, joined to a reversed copy of itself for the boomerang, and compressed to H.264. The house and yard are AI-generated, not a real property. Fence-style drawings are drawn in code. The **Our work** photos are the client's own jobs. No stock photos and no third-party logos are used.

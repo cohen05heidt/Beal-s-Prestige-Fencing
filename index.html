@@ -314,29 +314,30 @@
           <p class="eyebrow">Our work</p>
           <h2 id="workTitle">Fences we've built around Hall &amp; Jackson Counties.</h2>
         </header>
+        <!-- Each tile opens its photos in the viewer. To add a photo, append its path to data-photos. -->
         <div class="work-grid" id="workGrid">
-          <figure class="work-tile" data-fence="boardonboard">
-            <img src="assets/img/work/board-on-board.jpg" alt="Board on board wood privacy fence" loading="lazy">
+          <figure class="work-tile" data-fence="boardonboard" data-photos="assets/img/work/board-on-board-1.jpg assets/img/work/board-on-board-2.jpg assets/img/work/board-on-board-3.jpg">
+            <img src="assets/img/work/board-on-board-1-sm.jpg" alt="Board on board wood privacy fence with dog-ear tops along a side yard" width="560" height="700" loading="lazy">
             <figcaption>Board on board</figcaption>
           </figure>
-          <figure class="work-tile" data-fence="shadowbox">
-            <img src="assets/img/work/shadow-box.jpg" alt="Shadow box wood fence" loading="lazy">
+          <figure class="work-tile" data-fence="shadowbox" data-photos="assets/img/work/shadow-box-1.jpg assets/img/work/shadow-box-2.jpg assets/img/work/shadow-box-3.jpg">
+            <img src="assets/img/work/shadow-box-1-sm.jpg" alt="Shadow box wood fence around a green backyard" width="700" height="525" loading="lazy">
             <figcaption>Shadow box</figcaption>
           </figure>
-          <figure class="work-tile" data-fence="vinyl">
-            <img src="assets/img/work/white-vinyl.jpg" alt="White vinyl privacy fence" loading="lazy">
+          <figure class="work-tile" data-fence="vinyl" data-photos="assets/img/work/white-vinyl-1.jpg assets/img/work/white-vinyl-2.jpg assets/img/work/white-vinyl-3.jpg">
+            <img src="assets/img/work/white-vinyl-1-sm.jpg" alt="White vinyl privacy fence enclosing a backyard" width="525" height="700" loading="lazy">
             <figcaption>White vinyl</figcaption>
           </figure>
-          <figure class="work-tile" data-fence="chainlink">
-            <img src="assets/img/work/chain-link-and-shadow-box.jpg" alt="6 foot chain link fence alongside a wood shadow box fence" loading="lazy">
-            <figcaption>6 ft chain link &amp; wood shadow box</figcaption>
+          <figure class="work-tile" data-fence="chainlink" data-photos="assets/img/work/chain-link-1.jpg assets/img/work/chain-link-2.jpg">
+            <img src="assets/img/work/chain-link-1-sm.jpg" alt="6 foot galvanized chain link fence along a commercial lot" width="525" height="700" loading="lazy">
+            <figcaption>6 ft chain link</figcaption>
           </figure>
-          <figure class="work-tile" data-fence="stockade">
-            <img src="assets/img/work/wood-stockade.jpg" alt="Wood stockade privacy fence" loading="lazy">
+          <figure class="work-tile" data-fence="stockade" data-photos="assets/img/work/wood-stockade-1.jpg assets/img/work/wood-stockade-2.jpg">
+            <img src="assets/img/work/wood-stockade-1-sm.jpg" alt="New wood stockade privacy fence around a backyard with a shed" width="560" height="700" loading="lazy">
             <figcaption>Wood stockade</figcaption>
           </figure>
-          <figure class="work-tile" data-fence="aluminum">
-            <img src="assets/img/work/black-aluminum.jpg" alt="Black aluminum fence" loading="lazy">
+          <figure class="work-tile" data-fence="aluminum" data-photos="assets/img/work/black-aluminum-1.jpg assets/img/work/black-aluminum-2.jpg assets/img/work/black-aluminum-3.jpg">
+            <img src="assets/img/work/black-aluminum-1-sm.jpg" alt="Black aluminum fence around a community playground" width="525" height="700" loading="lazy">
             <figcaption>Black aluminum</figcaption>
           </figure>
         </div>
@@ -539,7 +540,9 @@
   <dialog class="viewer" id="viewer" aria-label="Photo viewer">
     <button class="viewer-close" type="button" id="viewerClose"><span class="sr-only">Close</span><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-close"/></svg></button>
     <img id="viewerImg" alt="">
-    <p id="viewerCap"></p>
+    <button class="viewer-nav viewer-prev" type="button" id="viewerPrev"><span class="sr-only">Previous photo</span><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></button>
+    <button class="viewer-nav viewer-next" type="button" id="viewerNext"><span class="sr-only">Next photo</span><svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></button>
+    <p class="viewer-bar"><span id="viewerCap"></span><span class="viewer-count" id="viewerCount"></span></p>
   </dialog>
 
   <!-- ===== Icons ===== -->

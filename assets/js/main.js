@@ -288,21 +288,45 @@
   }));
 
   /* ======================= Our work gallery ======================= */
+  // Each tile shows one cover photo; its data-photos list opens in the viewer with
+  // previous / next.
   const viewer = $('#viewer');
   const viewerImg = $('#viewerImg');
   const viewerCap = $('#viewerCap');
-  const openViewer = (img, caption) => {
-    viewerImg.src = img.currentSrc || img.src;
-    viewerImg.alt = img.alt;
-    viewerCap.textContent = caption;
-    if (viewer.showModal) viewer.showModal(); else window.open(img.src, '_blank');
+  const viewerCount = $('#viewerCount');
+  const viewerPrev = $('#viewerPrev');
+  const viewerNext = $('#viewerNext');
+  let set = { photos: [], caption: '', at: 0 };
+
+  const showPhoto = (i) => {
+    const n = set.photos.length;
+    set.at = (i + n) % n;
+    viewerImg.src = set.photos[set.at];
+    viewerImg.alt = `${set.caption} fence, photo ${set.at + 1} of ${n}`;
+    viewerCap.textContent = set.caption;
+    viewerCount.textContent = n > 1 ? `${set.at + 1} / ${n}` : '';
+    viewerPrev.hidden = viewerNext.hidden = n < 2;
+    if (n > 1) new Image().src = set.photos[(set.at + 1) % n]; // warm up the next one
+  };
+  const openViewer = (photos, caption) => {
+    set = { photos, caption, at: 0 };
+    showPhoto(0);
+    if (viewer.showModal) viewer.showModal(); else window.open(photos[0], '_blank');
   };
   $('#viewerClose').addEventListener('click', () => viewer.close());
+  viewerPrev.addEventListener('click', () => showPhoto(set.at - 1));
+  viewerNext.addEventListener('click', () => showPhoto(set.at + 1));
   viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
+  viewer.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') showPhoto(set.at - 1);
+    if (e.key === 'ArrowRight') showPhoto(set.at + 1);
+  });
 
   $$('.work-tile').forEach((tile) => {
     const img = $('img', tile);
-    const caption = $('figcaption', tile).textContent;
+    const caption = $('figcaption', tile).textContent.trim();
+    const photos = (tile.dataset.photos || '').split(/\s+/).filter(Boolean);
+    if (photos.length > 1) tile.insertAdjacentHTML('beforeend', `<span class="work-count">${photos.length} photos</span>`);
     const missing = () => {
       if (tile.classList.contains('is-missing')) return;
       tile.classList.add('is-missing');
@@ -314,12 +338,15 @@
     const ready = () => {
       tile.tabIndex = 0;
       tile.setAttribute('role', 'button');
-      tile.setAttribute('aria-label', `View photo: ${caption}`);
+      tile.setAttribute('aria-label', `View ${photos.length > 1 ? `${photos.length} photos` : 'photo'}: ${caption}`);
     };
     if (img.complete) { if (img.naturalWidth) ready(); else missing(); }
     img.addEventListener('error', missing);
     img.addEventListener('load', ready);
-    const open = () => { if (!tile.classList.contains('is-missing') && img.naturalWidth) openViewer(img, caption); };
+    const open = () => {
+      if (tile.classList.contains('is-missing') || !img.naturalWidth) return;
+      openViewer(photos.length ? photos : [img.currentSrc || img.src], caption);
+    };
     tile.addEventListener('click', open);
     tile.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   });
