@@ -186,19 +186,6 @@ p { margin: 0; }
 .hero-sub { text-shadow: 0 1px 14px rgba(0,34,0,.55); margin-top: 26px; max-width: 34rem; font-size: clamp(1.05rem, 1.4vw, 1.25rem); line-height: 1.5; color: rgba(255,250,221,.9); }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
 
-.hero-play {
-  position: absolute; right: var(--gutter); bottom: 28px; z-index: 2;
-  display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 14px 8px 12px;
-  border: 1px solid rgba(255,250,221,.35); border-radius: 999px;
-  background: rgba(0,34,0,.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  color: var(--cream); font: 500 .75rem/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
-}
-.hero-play:hover { background: rgba(0,34,0,.7); }
-.hero-play svg { width: 16px; height: 16px; }
-.hero-play .ic-play { display: none; }
-.hero-play.is-paused .ic-play { display: block; }
-.hero-play.is-paused .ic-pause { display: none; }
-
 @media (prefers-reduced-motion: no-preference) {
   .js .hero-eyebrow, .js .hero-line, .js .hero-sub, .js .hero-ctas { animation: rise .9s cubic-bezier(.2, .7, .2, 1) both; }
   .js .hero-line:nth-child(1) { animation-delay: .15s; }
@@ -221,7 +208,6 @@ p { margin: 0; }
   .hero-sub { margin-top: 16px; font-size: 1rem; }
   .hero-ctas { margin-top: 22px; }
   .hero-ctas .btn { flex: 1 1 auto; min-height: 52px; padding-inline: 1.1em; }
-  .hero-play { bottom: 20px; }
 }
 
 /* Phones and portrait tablets: instead of cropping a narrow slice of the film to fill the

@@ -33,21 +33,12 @@
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
 
   /* ======================= Hero film ======================= */
-  // The Higgsfield film is a boomerang loop: the fence builds around the empty yard in the
-  // first half, then rewinds in the second. The first time the fence is finished, the
-  // string line pulls tight under "Craftsmanship." and stays.
+  // The Higgsfield film loops: the fence builds, holds, then rewinds. The first time the
+  // fence is finished, the string line pulls tight under "Craftsmanship." and stays.
   const hero = $('.hero');
   const video = $('#heroVideo');
   const poster = $('#heroPoster');
-  const playBtn = $('#heroPlay');
-  const playLabel = $('.hero-play-label', playBtn);
   const tall = matchMedia('(orientation: portrait) and (max-width: 1024px)').matches; // phones and portrait tablets get the wide 10:9 cut
-
-  const setBtn = (state) => { // 'pause' | 'paused'
-    playBtn.hidden = false;
-    playBtn.classList.toggle('is-paused', state === 'paused');
-    playLabel.textContent = state === 'pause' ? 'Pause video' : 'Play video';
-  };
 
   const showFinished = () => {
     const source = poster.parentElement.querySelector('source');
@@ -62,10 +53,7 @@
     video.src = tall ? video.dataset.srcTall : video.dataset.srcWide;
     video.loop = true;
     video.muted = true;
-    video.addEventListener('playing', () => {
-      hero.classList.add('is-playing');
-      setBtn('pause');
-    });
+    video.addEventListener('playing', () => hero.classList.add('is-playing'));
     const builtAt = Number(video.dataset.builtAt) || 0; // seconds into the loop when the fence is finished
     const stringWhenBuilt = () => {
       if (video.duration && video.currentTime >= (builtAt || video.duration / 2 - 0.35)) {
@@ -87,21 +75,11 @@
         document.addEventListener('visibilitychange', start, { once: true });
         return;
       }
-      // Autoplay refused (e.g. iPhone low-power mode): show the finished fence and offer play.
+      // Autoplay refused (e.g. iPhone low-power mode): show the finished fence as a still.
       showFinished();
-      setBtn('paused');
     };
     start();
   }
-
-  playBtn.addEventListener('click', () => {
-    if (video.paused) {
-      video.play();
-    } else {
-      video.pause();
-      setBtn('paused');
-    }
-  });
 
   /* ======================= Fence elevation drawings ======================= */
   // Each style is drawn as a contractor's elevation (front view) on graph paper.
