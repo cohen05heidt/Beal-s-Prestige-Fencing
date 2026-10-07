@@ -108,6 +108,31 @@
       `<text x="${x}" y="${f(mid + 4)}" text-anchor="middle" class="e-dim-text">${Math.round(ft)}'-0"</text></g>`;
   };
 
+  // 6 ft privacy boards whose tops curve between capped posts. dir -1: scalloped (dips to
+  // about 5 ft mid-section), dir 1: arched (5 ft at the posts, rising to 6 ft mid-section).
+  const curvedTop = (dir) => {
+    const top = G - 6 * S, x0 = 52, x1 = 298, pw = 8, bw = 7, depth = S;
+    const posts = postsAt(x0, x1, 3, pw);
+    let s = '';
+    for (let k = 0; k < 3; k++) {
+      const b0 = posts[k] + pw, b1 = posts[k + 1], w = b1 - b0;
+      const yAt = (x) => {
+        const bow = depth * Math.sin(Math.PI * Math.min(1, Math.max(0, (x - b0) / w)));
+        return dir < 0 ? top + bow : top + depth - bow;
+      };
+      for (let x = b0, i = 0; x < b1 - 0.5; x += bw, i++) {
+        const xe = Math.min(x + bw, b1);
+        s += poly([[x, yAt(x)], [xe, yAt(xe)], [xe, G], [x, G]], i % 3 === 1 ? 'e-wood-2' : 'e-wood');
+      }
+    }
+    const postTop = dir < 0 ? top - 3 : top + depth - 4;
+    posts.forEach((px) => {
+      s += rect(px, postTop, pw, G - postTop, 'e-post');
+      s += poly([[px - 2, postTop], [px + pw + 2, postTop], [px + pw / 2, postTop - 7]], 'e-post');
+    });
+    return s + dimension(top, 6);
+  };
+
   const draw = {
     stockade() {
       const top = G - 6 * S, x0 = 34, x1 = 286, n = 28, bw = (x1 - x0) / n;
@@ -145,9 +170,61 @@
       return s;
     },
 
+    horizontal() {
+      const top = G - 6 * S, x0 = 52, x1 = 298, pw = 9, rows = 11;
+      const posts = postsAt(x0, x1, 3, pw);
+      const rh = (G - 2 - (top + 2)) / rows;
+      let s = '';
+      for (let k = 0; k < 3; k++) {
+        const b0 = posts[k] + pw - 1, b1 = posts[k + 1] + 1;
+        for (let r = 0; r < rows; r++) s += rect(b0, top + 2 + r * rh, b1 - b0, rh - 1.3, r % 3 === 1 ? 'e-wood-2' : 'e-wood');
+      }
+      posts.forEach((px) => { s += rect(px, top - 2, pw, G - top + 2, 'e-post'); });
+      return s + dimension(top, 6);
+    },
+
+    // Board tops follow a curve between posts: dipping (scalloped) or rising (arched).
+    scalloped() { return curvedTop(-1); },
+    arched() { return curvedTop(1); },
+
+    lattice() {
+      const top = G - 6 * S, x0 = 52, x1 = 298, pw = 10, band = 17;
+      const posts = postsAt(x0, x1, 3, pw);
+      const yL = top + band + 5; // where the solid boards start
+      let s = '';
+      for (let k = 0; k < 3; k++) {
+        const b0 = posts[k] + pw, b1 = posts[k + 1], w = b1 - b0;
+        s += rect(b0, yL, w, G - yL, 'e-wood-back');
+        for (let x = b0 + 1; x + 8 <= b1; x += 9) s += rect(x, yL, 8, G - yL, 'e-wood');
+        for (let x = b0 + 5; x < b1 - 2; x += 7) s += rect(x, top + 4, 1.8, yL - top - 4, 'e-slat');
+        for (let y = top + 9; y < yL - 2; y += 6) s += rect(b0, y, w, 1.8, 'e-slat');
+        s += rect(b0, yL - 3, w, 4, 'e-post') + rect(b0, top + 1, w, 4, 'e-post');
+      }
+      posts.forEach((px) => {
+        s += rect(px, top - 3, pw, G - top + 3, 'e-post') + rect(px - 2, top - 6, pw + 4, 3.5, 'e-post');
+        s += poly([[px - 1, top - 6], [px + pw + 1, top - 6], [px + pw / 2, top - 12]], 'e-post');
+      });
+      return s + dimension(top, 6);
+    },
+
     fourrail() {
       const top = G - 4.5 * S, x0 = 34, x1 = 286, pw = 7;
       let s = postsAt(x0, x1, 4, pw).map((px) => rect(px, top - 4, pw, G - top + 4, 'e-post')).join('');
+      for (let k = 0; k < 4; k++) {
+        const y = top + k * (G - 20 - top) / 3;
+        s += rect(x0 - 5, y, x1 - x0 + 10, 7, k % 2 ? 'e-wood-2' : 'e-wood');
+      }
+      return s;
+    },
+
+    fourrailwire() {
+      const top = G - 4.5 * S, x0 = 34, x1 = 286, pw = 7, wTop = top + 5;
+      let s = '';
+      // woven field wire behind the rails: vertical stays, line wires closer together near the ground
+      for (let x = x0; x <= x1; x += 7) s += line(x, wTop, x, G - 1, 'e-mesh');
+      for (let y = G - 3, gap = 4; y > wTop; y -= gap, gap = Math.min(gap + 0.9, 9)) s += line(x0, y, x1, y, 'e-mesh');
+      s += line(x0, wTop, x1, wTop, 'e-mesh');
+      s += postsAt(x0, x1, 4, pw).map((px) => rect(px, top - 4, pw, G - top + 4, 'e-post')).join('');
       for (let k = 0; k < 4; k++) {
         const y = top + k * (G - 20 - top) / 3;
         s += rect(x0 - 5, y, x1 - x0 + 10, 7, k % 2 ? 'e-wood-2' : 'e-wood');

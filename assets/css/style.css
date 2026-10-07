@@ -323,14 +323,14 @@ p { margin: 0; }
 .style-quote:hover { text-decoration: underline; text-decoration-color: var(--green); text-decoration-thickness: 2px; text-underline-offset: 4px; }
 .style-quote:hover svg { transform: translateX(3px); }
 
-.style-help {
-  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 14px;
-  padding: 30px 28px; border-radius: var(--radius);
+.style-help { /* full-width banner under all the styles */
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px;
+  padding: 28px 32px; border-radius: var(--radius);
   background: var(--pine); color: rgba(255,250,221,.85);
 }
-.style-help-title { font-family: var(--display); font-weight: 500; font-size: 1.7rem; line-height: 1.1; color: var(--cream); }
-.style-help .btn { margin-top: 6px; }
-@media (max-width: 1000px) { .style-help { grid-column: 1 / -1; } }
+.style-help > div { max-width: 44rem; }
+.style-help-title { margin-bottom: 6px; font-family: var(--display); font-weight: 500; font-size: 1.7rem; line-height: 1.1; color: var(--cream); }
+@media (max-width: 560px) { .style-help { padding: 24px 22px; } .style-help .btn { width: 100%; } }
 
 .ht { display: inline-flex; margin-top: 14px; padding: 3px; gap: 2px; background: var(--mist); border-radius: 999px; align-self: flex-start; }
 .ht button {
@@ -339,8 +339,11 @@ p { margin: 0; }
 }
 .ht button[aria-pressed="true"] { background: var(--pine); color: var(--cream); }
 
+.style-grid.style-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.style-grid-4 .style-body h4 { font-size: 1.32rem; }
+@media (max-width: 1100px) { .style-grid.style-grid-4 { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 1000px) { .style-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 600px) { .style-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .style-grid, .style-grid.style-grid-4 { grid-template-columns: 1fr; } }
 
 /* drawing parts (SVG built in main.js) */
 .e-ground { stroke: var(--pine); stroke-width: 1.6; }
@@ -356,6 +359,7 @@ p { margin: 0; }
 .e-alu { fill: #1E2522; }
 .e-steel { fill: #A3ACA6; stroke: #6E7772; stroke-width: .8; }
 .e-mesh { stroke: #7F8983; stroke-width: .75; fill: none; }
+.e-slat { fill: #C98545; }
 .e-wire { stroke: #6E7772; stroke-width: 1; }
 .e-dim { stroke: var(--green); stroke-width: 1.2; fill: none; }
 .e-dim-text { fill: var(--green); font: 600 11px var(--mono); letter-spacing: .02em; }

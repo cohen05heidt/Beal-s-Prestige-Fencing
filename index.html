@@ -21,7 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Trirong:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="assets/img/hero-start.jpg?v=4" media="not all and (orientation: portrait) and (max-width: 1024px)">
   <link rel="preload" as="image" href="assets/img/hero-start-sm.jpg?v=4" media="(orientation: portrait) and (max-width: 1024px)">
-  <link rel="stylesheet" href="assets/css/style.css?v=9">
+  <link rel="stylesheet" href="assets/css/style.css?v=10">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <!-- Business details for Google -->
   <script type="application/ld+json">
@@ -47,7 +47,8 @@
       "opens": "00:00", "closes": "23:59"
     },
     "makesOffer": [
-      "Wood stockade fence", "Shadow box fence", "Board on board fence", "4 rail farm fence", "Cross buck farm fence",
+      "Wood stockade fence", "Shadow box fence", "Board on board fence", "Horizontal wood fence", "Scalloped privacy fence", "Arched top fence", "Lattice top fence",
+      "4 rail farm fence", "4 rail farm fence with wire", "Cross buck farm fence",
       "White vinyl fence", "Black aluminum fence", "Chain link fence", "Gate replacement", "Fence repair"
     ]
   }
@@ -177,7 +178,7 @@
         <div class="style-groups">
           <div class="style-group">
             <h3 class="style-group-title">Wood privacy</h3>
-            <div class="style-grid">
+            <div class="style-grid style-grid-4">
               <article class="style-card" data-style="Wood stockade">
                 <div class="elev"><svg data-fence="stockade" role="img" aria-label="Drawing of a wood stockade fence"></svg></div>
                 <div class="style-body">
@@ -202,6 +203,44 @@
                   <a class="style-quote" href="#quote" data-quote="Board on board">Quote this style <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
                 </div>
               </article>
+              <article class="style-card" data-style="Horizontal wood">
+                <div class="elev"><svg data-fence="horizontal" role="img" aria-label="Drawing of a 6 foot horizontal wood fence"></svg></div>
+                <div class="style-body">
+                  <h4>Horizontal wood</h4>
+                  <p>Boards run side to side between the posts for a clean, modern look. Full privacy at 6 ft.</p>
+                  <a class="style-quote" href="#quote" data-quote="Horizontal wood">Quote this style <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="style-group">
+            <h3 class="style-group-title">Decorative tops</h3>
+            <div class="style-grid">
+              <article class="style-card" data-style="Scalloped privacy">
+                <div class="elev"><svg data-fence="scalloped" role="img" aria-label="Drawing of a 6 foot scalloped wood privacy fence"></svg></div>
+                <div class="style-body">
+                  <h4>Scalloped privacy</h4>
+                  <p>The tops dip in a gentle curve between each post, with capped posts. A softer, classic look at 6 ft.</p>
+                  <a class="style-quote" href="#quote" data-quote="Scalloped privacy">Quote this style <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+                </div>
+              </article>
+              <article class="style-card" data-style="Arched top">
+                <div class="elev"><svg data-fence="arched" role="img" aria-label="Drawing of a 6 foot wood fence with arched tops"></svg></div>
+                <div class="style-body">
+                  <h4>Arched top</h4>
+                  <p>The tops rise in a smooth arch across every section. Elegant from the street and private at 6 ft.</p>
+                  <a class="style-quote" href="#quote" data-quote="Arched top">Quote this style <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+                </div>
+              </article>
+              <article class="style-card" data-style="Lattice top">
+                <div class="elev"><svg data-fence="lattice" role="img" aria-label="Drawing of a 6 foot wood privacy fence with a lattice top"></svg></div>
+                <div class="style-body">
+                  <h4>Lattice top</h4>
+                  <p>A solid privacy fence finished with a band of wood lattice across the top. Lets light through, 6 ft overall.</p>
+                  <a class="style-quote" href="#quote" data-quote="Lattice top">Quote this style <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+                </div>
+              </article>
             </div>
           </div>
 
@@ -216,6 +255,14 @@
                   <a class="style-quote" href="#quote" data-quote="4 rail farm">Quote this style <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
                 </div>
               </article>
+              <article class="style-card" data-style="4 rail farm with wire">
+                <div class="elev"><svg data-fence="fourrailwire" role="img" aria-label="Drawing of a 4 rail farm fence with woven wire"></svg></div>
+                <div class="style-body">
+                  <h4>4 rail farm with wire</h4>
+                  <p>The same four rails with woven wire stretched behind them, so dogs, livestock and kids stay in.</p>
+                  <a class="style-quote" href="#quote" data-quote="4 rail farm with wire">Quote this style <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
+                </div>
+              </article>
               <article class="style-card" data-style="Cross buck farm">
                 <div class="elev"><svg data-fence="crossbuck" role="img" aria-label="Drawing of a cross buck farm fence"></svg></div>
                 <div class="style-body">
@@ -224,11 +271,6 @@
                   <a class="style-quote" href="#quote" data-quote="Cross buck farm">Quote this style <svg aria-hidden="true" viewBox="0 0 24 24"><use href="#i-arrow"/></svg></a>
                 </div>
               </article>
-              <aside class="style-help">
-                <p class="style-help-title">Not sure which one?</p>
-                <p>Tell us what the fence is for (privacy, pets, a pool, livestock or curb appeal) and we'll recommend a style and height that fits your property.</p>
-                <a class="btn btn-flag" href="#quote" data-quote="Not sure yet">Help me choose</a>
-              </aside>
             </div>
           </div>
 
@@ -269,6 +311,14 @@
               </article>
             </div>
           </div>
+
+          <aside class="style-help">
+            <div>
+              <p class="style-help-title">Not sure which one?</p>
+              <p>Tell us what the fence is for (privacy, pets, a pool, livestock or curb appeal) and we'll recommend a style and height that fits your property.</p>
+            </div>
+            <a class="btn btn-flag" href="#quote" data-quote="Not sure yet">Help me choose</a>
+          </aside>
         </div>
       </div>
     </section>
@@ -443,7 +493,12 @@
                 <option>Wood stockade</option>
                 <option>Shadow box</option>
                 <option>Board on board</option>
+                <option>Horizontal wood</option>
+                <option>Scalloped privacy</option>
+                <option>Arched top</option>
+                <option>Lattice top</option>
                 <option>4 rail farm</option>
+                <option>4 rail farm with wire</option>
                 <option>Cross buck farm</option>
                 <option>White vinyl</option>
                 <option>Black aluminum</option>
@@ -556,6 +611,6 @@
     <symbol id="i-storm" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"><path d="M14 26h20a8 8 0 0 0 0-16 11 11 0 0 0-21 3 6.5 6.5 0 0 0 1 13z"/><path d="m25 26-5 8h7l-5 9"/></g></symbol>
   </svg>
 
-  <script src="assets/js/main.js?v=8" defer></script>
+  <script src="assets/js/main.js?v=9" defer></script>
 </body>
 </html>
