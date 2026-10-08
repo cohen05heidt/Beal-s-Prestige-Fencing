@@ -150,4 +150,4 @@ The stage stills are in `_src/gen2/` (`stage0-empty.png` … `stage5-finished.pn
 
 **Service area wording:** the site says "Hall and surrounding counties" everywhere visitors read it. The hidden business details for Google (the `application/ld+json` block in `index.html`) still list Hall County and Jackson County as service areas, which helps the business show up in local searches in both.
 
-**Licensed & insured** appears in four places: a shield badge under the buttons in the opening (visible without scrolling), first in the promise strip, in the line beside the quote form, and in the footer. If the business ever wants to show a license number, the badge text in `index.html` (search `hero-trust`) is the place to add it.
+**Licensed & insured** appears in five places: a shield badge under the buttons in the opening (visible without scrolling), first in the promise strip, in the About text, in the line beside the quote form, and in the footer. If the business ever wants to show a license number, the badge text in `index.html` (search `hero-trust`) is the place to add it.
