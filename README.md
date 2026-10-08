@@ -21,7 +21,7 @@ To switch it off: repo **Settings → Pages →** set the branch to **None** →
 | Section | What it does |
 |---|---|
 | Opening | A Higgsfield time-lapse loops behind the headline: behind a white modern farmhouse, the fence line is staked out, posts go in, rails go on, the boards fill in and the gate is hung (about 6 seconds, no people in the shot). The finished fence holds for 3 seconds, then it rewinds quickly and builds again. The first time the fence is finished, a cream "string line" pulls tight under *Craftsmanship.* Phones and portrait tablets get a zoomed-out view: the headline sits on green at the top and a wide cut of the film (the whole house and fence) runs along the bottom. |
-| Promise strip | Family owned · 24/7 customer service · Residential & commercial · Free quotes · Hall & surrounding counties. |
+| Promise strip | Licensed & insured · Family owned · 24/7 customer service · Residential & commercial · Free quotes · Hall & surrounding counties. |
 | Services | Residential, commercial, gates & repairs, complete fence overhaul, storm & emergency service. |
 | Fence styles | Thirteen styles drawn in code as contractor elevation drawings (no photos), in four groups. Wood privacy: wood stockade, shadow box, board on board, horizontal wood. Decorative tops: scalloped privacy, arched top, lattice top (all 6 ft). Farm: 4 rail farm, 4 rail farm with wire, cross buck farm. Vinyl & metal: white vinyl, black aluminum, chain link. Aluminum and chain link have a **4 ft / 6 ft** switch that resizes the drawing. Every card has **Quote this style**, which jumps to the form with that style (and height) already picked. |
 | About us | The family-owned story, plus a "Give us a call when…" list. |
@@ -149,3 +149,5 @@ The opening film was generated with **Higgsfield** as a five-step build:
 The stage stills are in `_src/gen2/` (`stage0-empty.png` … `stage5-finished.png`). The house and yard are AI-generated, not a real property. Fence-style drawings are drawn in code. The **Our work** photos are the client's own jobs. No stock photos and no third-party logos are used.
 
 **Service area wording:** the site says "Hall and surrounding counties" everywhere visitors read it. The hidden business details for Google (the `application/ld+json` block in `index.html`) still list Hall County and Jackson County as service areas, which helps the business show up in local searches in both.
+
+**Licensed & insured** appears in four places: a shield badge under the buttons in the opening (visible without scrolling), first in the promise strip, in the line beside the quote form, and in the footer. If the business ever wants to show a license number, the badge text in `index.html` (search `hero-trust`) is the place to add it.
