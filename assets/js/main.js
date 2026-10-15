@@ -1,0 +1,548 @@
+/* Beal’s Prestige Fencing - all page interaction. Plain JavaScript, no libraries. */
+(() => {
+  'use strict';
+
+  // ---------------------------------------------------------------------------
+  // Quote form delivery
+  // The form posts to api/quote.php on Hostinger, which saves the request and emails it
+  // through Resend. Where PHP isn't running (the GitHub preview, or opening the file
+  // directly) the form falls back to opening the visitor's email app.
+  const QUOTE_ENDPOINT = 'api/quote.php';
+  const QUOTE_EMAIL = 'Bealspf@gmail.com';
+  const PHONE = '(770) 540-6190';
+  // ---------------------------------------------------------------------------
+
+  const $ = (s, root = document) => root.querySelector(s);
+  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const saveData = !!(navigator.connection && navigator.connection.saveData);
+
+  /* ======================= Top bar ======================= */
+  const nav = $('#nav');
+  const onScroll = () => nav.classList.toggle('is-solid', window.scrollY > 24);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Highlight the tab for the section on screen, and keep it in view in the scrolling tab row
+  const tabs = $$('#navLinks a:not(.nav-links-quote)');
+  const sections = tabs.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  let current = null;
+  const markTab = () => {
+    const line = nav.offsetHeight + window.innerHeight * 0.3;
+    let id = null;
+    sections.forEach((s) => { if (s.getBoundingClientRect().top <= line) id = s.id; });
+    if (id === current) return;
+    current = id;
+    tabs.forEach((a) => {
+      const on = a.getAttribute('href') === '#' + id;
+      if (on) { a.setAttribute('aria-current', 'true'); const row = a.parentElement; if (row.scrollWidth > row.clientWidth) row.scrollTo({ left: a.offsetLeft - (row.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' }); }
+      else a.removeAttribute('aria-current');
+    });
+  };
+  markTab();
+  window.addEventListener('scroll', markTab, { passive: true });
+  window.addEventListener('resize', markTab);
+
+  /* ======================= Hero film ======================= */
+  // The Higgsfield film loops: the fence builds, holds, then rewinds. The first time the
+  // fence is finished, the string line pulls tight under "Craftsmanship." and stays.
+  const hero = $('.hero');
+  const video = $('#heroVideo');
+  const poster = $('#heroPoster');
+  const tall = matchMedia('(orientation: portrait) and (max-width: 1024px)').matches; // phones and portrait tablets get the wide 10:9 cut
+
+  const showFinished = () => {
+    const source = poster.parentElement.querySelector('source');
+    if (source) source.srcset = video.dataset.endTall;
+    poster.src = video.dataset.endWide;
+    hero.classList.add('is-strung');
+  };
+
+  if (reduceMotion || saveData) {
+    showFinished();
+  } else {
+    video.src = tall ? video.dataset.srcTall : video.dataset.srcWide;
+    video.loop = true;
+    video.muted = true;
+    video.addEventListener('playing', () => hero.classList.add('is-playing'));
+    const builtAt = Number(video.dataset.builtAt) || 0; // seconds into the loop when the fence is finished
+    const stringWhenBuilt = () => {
+      if (video.duration && video.currentTime >= (builtAt || video.duration / 2 - 0.35)) {
+        hero.classList.add('is-strung');
+        video.removeEventListener('timeupdate', stringWhenBuilt);
+      }
+    };
+    video.addEventListener('timeupdate', stringWhenBuilt);
+    video.addEventListener('error', showFinished);
+    let retried = false;
+    const start = () => {
+      const attempt = video.play();
+      if (attempt && attempt.catch) attempt.catch(blocked);
+    };
+    const blocked = () => {
+      // A tab opened in the background may refuse until it's visible: try once more then.
+      if (!retried && document.visibilityState === 'hidden') {
+        retried = true;
+        document.addEventListener('visibilitychange', start, { once: true });
+        return;
+      }
+      // Autoplay refused (e.g. iPhone low-power mode): show the finished fence as a still.
+      showFinished();
+    };
+    start();
+  }
+
+  /* ======================= Fence elevation drawings ======================= */
+  // Each style is drawn as a contractor's elevation (front view) on graph paper.
+  // viewBox is 320 x 170; the ground line sits at y = G; S pixels = one foot.
+  const G = 146, S = 15;
+  let uid = 0;
+  const f = (n) => Math.round(n * 10) / 10;
+  const rect = (x, y, w, h, cls, extra = '') => `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" class="${cls}"${extra}/>`;
+  const poly = (pts, cls) => `<polygon points="${pts.map((p) => p.map(f).join(',')).join(' ')}" class="${cls}"/>`;
+  const line = (x1, y1, x2, y2, cls) => `<line x1="${f(x1)}" y1="${f(y1)}" x2="${f(x2)}" y2="${f(y2)}" class="${cls}"/>`;
+  const postsAt = (x0, x1, bays, w) => Array.from({ length: bays + 1 }, (_, k) => x0 + k * (x1 - x0 - w) / bays);
+
+  const ground = () => {
+    let s = line(10, G, 310, G, 'e-ground');
+    for (let x = 16; x <= 306; x += 9) s += line(x, G + 1.5, x - 5, G + 7, 'e-hatch');
+    return s;
+  };
+
+  const dimension = (top, ft) => {
+    const x = 30, mid = (top + G) / 2;
+    return line(x, top, x, G, 'e-dim') +
+      line(x - 5, top, x + 16, top, 'e-dim') + line(x - 5, G, x + 5, G, 'e-dim') +
+      `<path d="M${x - 3} ${f(top + 7)} L${x} ${f(top)} L${x + 3} ${f(top + 7)}" class="e-dim"/>` +
+      `<path d="M${x - 3} ${G - 7} L${x} ${G} L${x + 3} ${G - 7}" class="e-dim"/>` +
+      `<g transform="rotate(-90 ${x} ${f(mid)})">${rect(x - 19, mid - 7, 38, 14, 'e-dim-bg')}` +
+      `<text x="${x}" y="${f(mid + 4)}" text-anchor="middle" class="e-dim-text">${Math.round(ft)}'-0"</text></g>`;
+  };
+
+  // 6 ft privacy boards whose tops curve between capped posts. dir -1: scalloped (dips to
+  // about 5 ft mid-section), dir 1: arched (5 ft at the posts, rising to 6 ft mid-section).
+  const curvedTop = (dir) => {
+    const top = G - 6 * S, x0 = 52, x1 = 298, pw = 8, bw = 7, depth = S;
+    const posts = postsAt(x0, x1, 3, pw);
+    let s = '';
+    for (let k = 0; k < 3; k++) {
+      const b0 = posts[k] + pw, b1 = posts[k + 1], w = b1 - b0;
+      const yAt = (x) => {
+        const bow = depth * Math.sin(Math.PI * Math.min(1, Math.max(0, (x - b0) / w)));
+        return dir < 0 ? top + bow : top + depth - bow;
+      };
+      for (let x = b0, i = 0; x < b1 - 0.5; x += bw, i++) {
+        const xe = Math.min(x + bw, b1);
+        s += poly([[x, yAt(x)], [xe, yAt(xe)], [xe, G], [x, G]], i % 3 === 1 ? 'e-wood-2' : 'e-wood');
+      }
+    }
+    const postTop = dir < 0 ? top - 3 : top + depth - 4;
+    posts.forEach((px) => {
+      s += rect(px, postTop, pw, G - postTop, 'e-post');
+      s += poly([[px - 2, postTop], [px + pw + 2, postTop], [px + pw / 2, postTop - 7]], 'e-post');
+    });
+    return s + dimension(top, 6);
+  };
+
+  const draw = {
+    stockade() {
+      const top = G - 6 * S, x0 = 34, x1 = 286, n = 28, bw = (x1 - x0) / n;
+      let s = '';
+      for (let i = 0; i < n; i++) {
+        const x = x0 + i * bw;
+        s += poly([[x, top + 5], [x + bw / 2, top], [x + bw, top + 5], [x + bw, G], [x, G]], i % 3 === 1 ? 'e-wood-2' : 'e-wood');
+      }
+      return s;
+    },
+
+    shadowbox() {
+      const top = G - 6 * S, x0 = 34, x1 = 286, pw = 9, p = 13, bw = 8;
+      let s = postsAt(x0, x1, 3, pw).map((px) => rect(px, top, pw, G - top, 'e-post')).join('');
+      for (let x = x0 + 2 + p / 2; x + bw <= x1 - 1; x += p) s += rect(x, top + 4, bw, G - top - 7, 'e-wood-back');
+      [top + 11, (top + G) / 2 - 2, G - 17].forEach((y) => { s += rect(x0, y, x1 - x0, 5, 'e-post'); });
+      for (let x = x0 + 2; x + bw <= x1 - 1; x += p) s += rect(x, top + 4, bw, G - top - 7, 'e-wood');
+      s += rect(x0 - 3, top - 1, x1 - x0 + 6, 5, 'e-post');
+      return s;
+    },
+
+    boardonboard() {
+      const top = G - 6 * S, x0 = 34, x1 = 286, pw = 10;
+      const posts = postsAt(x0, x1, 3, pw);
+      let s = posts.map((px) => rect(px, top - 4, pw, G - top + 4, 'e-post')).join('');
+      for (let k = 0; k < 3; k++) {
+        const b0 = posts[k] + pw, b1 = posts[k + 1], bwid = b1 - b0;
+        s += rect(b0, top + 5, bwid, G - top - 11, 'e-wood-back');
+        for (let x = b0 + 2; x + 9 <= b1 - 1; x += 13) s += rect(x, top + 5, 9, G - top - 11, 'e-wood');
+        s += rect(b0, top, bwid, 6, 'e-wood-2');
+        s += rect(b0, G - 6, bwid, 6, 'e-wood-back');
+      }
+      s += rect(x0 - 3, top - 7, x1 - x0 + 6, 4, 'e-post');
+      posts.forEach((px) => { s += rect(px - 2, top - 10, pw + 4, 4, 'e-post'); });
+      return s;
+    },
+
+    horizontal() {
+      const top = G - 6 * S, x0 = 52, x1 = 298, pw = 9, rows = 11;
+      const posts = postsAt(x0, x1, 3, pw);
+      const rh = (G - 2 - (top + 2)) / rows;
+      let s = '';
+      for (let k = 0; k < 3; k++) {
+        const b0 = posts[k] + pw - 1, b1 = posts[k + 1] + 1;
+        for (let r = 0; r < rows; r++) s += rect(b0, top + 2 + r * rh, b1 - b0, rh - 1.3, r % 3 === 1 ? 'e-wood-2' : 'e-wood');
+      }
+      posts.forEach((px) => { s += rect(px, top - 2, pw, G - top + 2, 'e-post'); });
+      return s + dimension(top, 6);
+    },
+
+    // Board tops follow a curve between posts: dipping (scalloped) or rising (arched).
+    scalloped() { return curvedTop(-1); },
+    arched() { return curvedTop(1); },
+
+    lattice() {
+      const top = G - 6 * S, x0 = 52, x1 = 298, pw = 10, band = 17;
+      const posts = postsAt(x0, x1, 3, pw);
+      const yL = top + band + 5; // where the solid boards start
+      let s = '';
+      for (let k = 0; k < 3; k++) {
+        const b0 = posts[k] + pw, b1 = posts[k + 1], w = b1 - b0;
+        s += rect(b0, yL, w, G - yL, 'e-wood-back');
+        for (let x = b0 + 1; x + 8 <= b1; x += 9) s += rect(x, yL, 8, G - yL, 'e-wood');
+        for (let x = b0 + 5; x < b1 - 2; x += 7) s += rect(x, top + 4, 1.8, yL - top - 4, 'e-slat');
+        for (let y = top + 9; y < yL - 2; y += 6) s += rect(b0, y, w, 1.8, 'e-slat');
+        s += rect(b0, yL - 3, w, 4, 'e-post') + rect(b0, top + 1, w, 4, 'e-post');
+      }
+      posts.forEach((px) => {
+        s += rect(px, top - 3, pw, G - top + 3, 'e-post') + rect(px - 2, top - 6, pw + 4, 3.5, 'e-post');
+        s += poly([[px - 1, top - 6], [px + pw + 1, top - 6], [px + pw / 2, top - 12]], 'e-post');
+      });
+      return s + dimension(top, 6);
+    },
+
+    fourrail() {
+      const top = G - 4.5 * S, x0 = 34, x1 = 286, pw = 7;
+      let s = postsAt(x0, x1, 4, pw).map((px) => rect(px, top - 4, pw, G - top + 4, 'e-post')).join('');
+      for (let k = 0; k < 4; k++) {
+        const y = top + k * (G - 20 - top) / 3;
+        s += rect(x0 - 5, y, x1 - x0 + 10, 7, k % 2 ? 'e-wood-2' : 'e-wood');
+      }
+      return s;
+    },
+
+    fourrailwire() {
+      const top = G - 4.5 * S, x0 = 34, x1 = 286, pw = 7, wTop = top + 5;
+      let s = '';
+      // woven field wire behind the rails: vertical stays, line wires closer together near the ground
+      for (let x = x0; x <= x1; x += 7) s += line(x, wTop, x, G - 1, 'e-mesh');
+      for (let y = G - 3, gap = 4; y > wTop; y -= gap, gap = Math.min(gap + 0.9, 9)) s += line(x0, y, x1, y, 'e-mesh');
+      s += line(x0, wTop, x1, wTop, 'e-mesh');
+      s += postsAt(x0, x1, 4, pw).map((px) => rect(px, top - 4, pw, G - top + 4, 'e-post')).join('');
+      for (let k = 0; k < 4; k++) {
+        const y = top + k * (G - 20 - top) / 3;
+        s += rect(x0 - 5, y, x1 - x0 + 10, 7, k % 2 ? 'e-wood-2' : 'e-wood');
+      }
+      return s;
+    },
+
+    crossbuck() {
+      const top = G - 4 * S, x0 = 34, x1 = 286, pw = 9, rh = 7;
+      const posts = postsAt(x0, x1, 3, pw);
+      let s = posts.map((px) => rect(px, top - 5, pw, G - top + 5, 'e-post')).join('');
+      const yT = top + rh, yB = G - 21;
+      for (let k = 0; k < 3; k++) {
+        const b0 = posts[k] + pw + 1, b1 = posts[k + 1] - 1;
+        s += line(b0, yT, b1, yB, 'e-brace') + line(b0, yB, b1, yT, 'e-brace');
+        s += line(b0, yT, b1, yB, 'e-brace-face') + line(b0, yB, b1, yT, 'e-brace-face');
+      }
+      s += rect(x0 - 4, top, x1 - x0 + 8, rh, 'e-wood') + rect(x0 - 4, yB, x1 - x0 + 8, rh, 'e-wood');
+      return s;
+    },
+
+    vinyl() {
+      const top = G - 6 * S, x0 = 34, x1 = 286, pw = 11;
+      const posts = postsAt(x0, x1, 3, pw);
+      let s = '';
+      for (let k = 0; k < 3; k++) {
+        const b0 = posts[k] + pw, b1 = posts[k + 1], bwid = b1 - b0;
+        s += rect(b0, top + 1, bwid, G - top - 2, 'e-vinyl');
+        for (let x = b0 + 9; x < b1 - 3; x += 9) s += line(x, top + 8, x, G - 8, 'e-vinyl-line');
+        s += rect(b0, top + 1, bwid, 7, 'e-vinyl') + rect(b0, G - 8, bwid, 7, 'e-vinyl');
+      }
+      posts.forEach((px) => {
+        s += rect(px, top - 3, pw, G - top + 3, 'e-vinyl');
+        s += poly([[px - 2, top - 3], [px + pw + 2, top - 3], [px + pw + 2, top - 7], [px + pw / 2, top - 11], [px - 2, top - 7]], 'e-vinyl');
+      });
+      return s;
+    },
+
+    aluminum(ft) {
+      const top = G - ft * S, x0 = 52, x1 = 298, pw = 6;
+      const posts = postsAt(x0, x1, 3, pw);
+      let s = '';
+      for (let x = x0 + 5; x < x1 - 3; x += 7) {
+        if (posts.some((px) => x > px - 3 && x < px + pw + 1)) continue;
+        s += rect(x, top, 1.9, G - top - 5, 'e-alu');
+      }
+      [top, top + 7, G - 13].forEach((y) => { s += rect(x0, y, x1 - x0, 2.8, 'e-alu'); });
+      posts.forEach((px) => { s += rect(px, top - 4, pw, G - top + 4, 'e-alu') + rect(px - 1.5, top - 7, pw + 3, 3, 'e-alu'); });
+      return s + dimension(top, ft);
+    },
+
+    wroughtiron(ft) {
+      const top = G - ft * S, x0 = 52, x1 = 298, pw = 7;
+      const posts = postsAt(x0, x1, 3, pw);
+      const r1 = top + 9, r2 = top + 21; // double top rail with rings between
+      let s = '';
+      for (let x = x0 + 6, i = 0; x < x1 - 4; x += 8, i++) {
+        if (posts.some((px) => x > px - 4 && x < px + pw + 2)) continue;
+        const cx = x + 1.1;
+        s += rect(x, top + 5, 2.2, G - top - 9, 'e-alu');
+        s += poly([[cx, top], [cx + 2.6, top + 5], [cx, top + 7.5], [cx - 2.6, top + 5]], 'e-alu');
+        if (i % 2 === 0) s += `<circle cx="${f(x + 5.1)}" cy="${f((r1 + r2) / 2 + 1.4)}" r="3.1" class="e-iron-ring"/>`;
+      }
+      [r1, r2, G - 13].forEach((y) => { s += rect(x0, y, x1 - x0, 2.8, 'e-alu'); });
+      posts.forEach((px) => {
+        s += rect(px, top + 1, pw, G - top - 1, 'e-alu');
+        s += rect(px - 1.5, top - 1, pw + 3, 2.6, 'e-alu');
+        s += `<circle cx="${f(px + pw / 2)}" cy="${f(top - 4.5)}" r="3.6" class="e-alu"/>`;
+      });
+      return s + dimension(top, ft);
+    },
+
+    chainlink(ft) {
+      const top = G - ft * S, x0 = 52, x1 = 298, id = `mesh${++uid}`;
+      let s = `<defs><pattern id="${id}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="translate(${x0} ${f(top)})">` +
+        `<path d="M0 0L7 7M7 0L0 7" class="e-mesh"/></pattern></defs>`;
+      s += `<rect x="${x0}" y="${f(top + 1)}" width="${x1 - x0}" height="${f(G - top - 3)}" fill="url(#${id})"/>`;
+      s += line(x0, G - 2, x1, G - 2, 'e-wire');
+      s += rect(x0, top - 1, x1 - x0, 3.2, 'e-steel', ' rx="1.5"');
+      postsAt(x0, x1, 3, 4).slice(1, -1).forEach((px) => { s += rect(px, top - 2, 4, G - top + 2, 'e-steel', ' rx="2"'); });
+      [x0 - 3, x1 - 3].forEach((px) => { s += rect(px, top - 6, 6, G - top + 6, 'e-steel', ' rx="3"') + rect(px - 1, top - 8, 8, 3, 'e-steel', ' rx="1.5"'); });
+      return s + dimension(top, ft);
+    },
+  };
+
+  const render = (svg, ft) => {
+    const kind = svg.dataset.fence;
+    svg.setAttribute('viewBox', '0 0 320 170');
+    svg.innerHTML = ground() + draw[kind](ft || Number(svg.dataset.ft) || 6);
+  };
+
+  const makeDrawing = (kind) => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.dataset.fence = kind;
+    svg.setAttribute('aria-hidden', 'true');
+    render(svg);
+    return svg;
+  };
+
+  $$('svg[data-fence]').forEach((svg) => render(svg));
+
+  // 4 ft / 6 ft switch: the fence grows or shrinks on the drawing
+  $$('.ht').forEach((group) => {
+    const svg = $('svg[data-fence]', group.closest('.style-card'));
+    const name = $('h4', group.closest('.style-card')).textContent.toLowerCase();
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn || btn.getAttribute('aria-pressed') === 'true') return;
+      $$('button', group).forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      const from = Number(svg.dataset.ft), to = Number(btn.dataset.ft);
+      svg.dataset.ft = to;
+      svg.setAttribute('aria-label', `Drawing of a ${name} fence, ${to} feet tall`);
+      if (reduceMotion) return render(svg, to);
+      const t0 = performance.now(), dur = 420;
+      const step = (now) => {
+        const t = Math.min(1, (now - t0) / dur);
+        const e2 = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        render(svg, from + (to - from) * e2);
+        if (t < 1) requestAnimationFrame(step); else render(svg, to);
+      };
+      requestAnimationFrame(step);
+    });
+  });
+
+  /* ======================= "Get a quote" links ======================= */
+  const qStyle = $('#qStyle');
+  const qHeight = $('#qHeight');
+  $$('[data-quote]').forEach((a) => a.addEventListener('click', () => {
+    const style = a.dataset.quote;
+    if (!style) return;
+    qStyle.value = style;
+    const pressed = $('.ht [aria-pressed="true"]', a.closest('.style-card'));
+    if (pressed) qHeight.value = `${pressed.dataset.ft} ft`;
+    const field = qStyle.closest('.field');
+    field.classList.remove('flash');
+    void field.offsetWidth;
+    field.classList.add('flash');
+  }));
+
+  /* ======================= Our work gallery ======================= */
+  // Each tile shows one cover photo; its data-photos list opens in the viewer with
+  // previous / next.
+  const viewer = $('#viewer');
+  const viewerImg = $('#viewerImg');
+  const viewerCap = $('#viewerCap');
+  const viewerCount = $('#viewerCount');
+  const viewerPrev = $('#viewerPrev');
+  const viewerNext = $('#viewerNext');
+  let set = { photos: [], caption: '', at: 0 };
+
+  const showPhoto = (i) => {
+    const n = set.photos.length;
+    set.at = (i + n) % n;
+    viewerImg.src = set.photos[set.at];
+    viewerImg.alt = `${set.caption} fence, photo ${set.at + 1} of ${n}`;
+    viewerCap.textContent = set.caption;
+    viewerCount.textContent = n > 1 ? `${set.at + 1} / ${n}` : '';
+    viewerPrev.hidden = viewerNext.hidden = n < 2;
+    if (n > 1) new Image().src = set.photos[(set.at + 1) % n]; // warm up the next one
+  };
+  const openViewer = (photos, caption) => {
+    set = { photos, caption, at: 0 };
+    showPhoto(0);
+    if (viewer.showModal) viewer.showModal(); else window.open(photos[0], '_blank');
+  };
+  $('#viewerClose').addEventListener('click', () => viewer.close());
+  viewerPrev.addEventListener('click', () => showPhoto(set.at - 1));
+  viewerNext.addEventListener('click', () => showPhoto(set.at + 1));
+  viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
+  viewer.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') showPhoto(set.at - 1);
+    if (e.key === 'ArrowRight') showPhoto(set.at + 1);
+  });
+
+  $$('.work-tile').forEach((tile) => {
+    const img = $('img', tile);
+    const caption = $('figcaption', tile).textContent.trim();
+    const photos = (tile.dataset.photos || '').split(/\s+/).filter(Boolean);
+    if (photos.length > 1) tile.insertAdjacentHTML('beforeend', `<span class="work-count">${photos.length} photos</span>`);
+    const missing = () => {
+      if (tile.classList.contains('is-missing')) return;
+      tile.classList.add('is-missing');
+      const d = makeDrawing(tile.dataset.fence);
+      d.classList.add('work-draw');
+      tile.prepend(d);
+      tile.insertAdjacentHTML('afterbegin', '<span class="work-soon">Photo coming soon</span>');
+    };
+    const ready = () => {
+      tile.tabIndex = 0;
+      tile.setAttribute('role', 'button');
+      tile.setAttribute('aria-label', `View ${photos.length > 1 ? `${photos.length} photos` : 'photo'}: ${caption}`);
+    };
+    if (img.complete) { if (img.naturalWidth) ready(); else missing(); }
+    img.addEventListener('error', missing);
+    img.addEventListener('load', ready);
+    const open = () => {
+      if (tile.classList.contains('is-missing') || !img.naturalWidth) return;
+      openViewer(photos.length ? photos : [img.currentSrc || img.src], caption);
+    };
+    tile.addEventListener('click', open);
+    tile.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  });
+
+  // About photo appears once assets/img/about.jpg exists
+  const aboutFig = $('#aboutPhoto');
+  if (aboutFig) {
+    const probe = new Image();
+    probe.onload = () => { aboutFig.hidden = false; };
+    probe.src = $('img', aboutFig).getAttribute('src');
+  }
+
+  /* ======================= Reviews ======================= */
+  // Sample review cards show only on previews (this computer, or the GitHub preview link),
+  // never on the real domain. With no real reviews yet, the live site shows just the
+  // "Leave a Google review" banner.
+  const isPreview = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$|\.github\.io$/.test(location.hostname);
+  if (isPreview) document.documentElement.classList.add('show-samples');
+  const reviewGrid = $('#reviewGrid');
+  if (reviewGrid && !isPreview && !$('.review:not(.is-sample)', reviewGrid)) {
+    reviewGrid.hidden = true;
+    $('.reviews-head').hidden = true;
+  }
+
+  /* ======================= Phone action bar ======================= */
+  const bar = $('#actionbar');
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([entry]) => bar.classList.toggle('is-shown', !entry.isIntersecting))
+      .observe($('.hero-ctas'));
+  } else {
+    bar.classList.add('is-shown');
+  }
+
+  /* ======================= Quote form ======================= */
+  const form = $('#quoteForm');
+  const status = $('#formStatus');
+  const say = (msg, kind) => { status.textContent = msg; status.className = `form-status is-${kind}`; };
+
+  form.addEventListener('reset', () => $$('[aria-invalid]', form).forEach((el) => el.removeAttribute('aria-invalid')));
+  form.addEventListener('input', (e) => {
+    if (e.target.getAttribute('aria-invalid') === 'true' && e.target.value.trim()) e.target.removeAttribute('aria-invalid');
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (form.botcheck.value) return;
+
+    let firstBad = null;
+    ['name', 'phone', 'address'].forEach((n) => {
+      const el = form.elements[n];
+      const ok = n === 'phone' ? el.value.replace(/\D/g, '').length >= 10 : el.value.trim() !== '';
+      if (ok) el.removeAttribute('aria-invalid'); else { el.setAttribute('aria-invalid', 'true'); firstBad = firstBad || el; }
+    });
+    if (firstBad) {
+      say(firstBad.name === 'phone' && firstBad.value.trim()
+        ? 'Enter a 10-digit phone number so we can call you back.'
+        : 'Add your name, phone number and property address so we can get back to you.', 'err');
+      firstBad.focus();
+      return;
+    }
+
+    const d = Object.fromEntries(new FormData(form));
+    const subject = `Quote request: ${d.style} (${d.property}) - ${d.name}`;
+    const body = [
+      `Name: ${d.name}`, `Phone: ${d.phone}`, `Email: ${d.email || '-'}`, `Property: ${d.address}`,
+      `Property type: ${d.property}`, `Needs: ${d.job}`, `Fence style: ${d.style}`, `Height: ${d.height}`,
+      `Approx. length: ${d.length || '-'}`, '', d.message || '',
+    ].join('\n');
+
+    const openEmailApp = () => {
+      window.location.href = `mailto:${QUOTE_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      say(`Your email app should open with the request filled in. Press send to finish. Nothing opened? Call or text ${PHONE}.`, 'ok');
+    };
+
+    const btn = $('button[type="submit"]', form);
+    btn.disabled = true;
+    say('Sending...', 'ok');
+    let res;
+    let out = null;
+    try {
+      res = await fetch(QUOTE_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(d),
+      });
+      out = await res.json().catch(() => null);
+    } catch (err) {
+      res = null;
+    } finally {
+      btn.disabled = false;
+    }
+
+    if (out && out.ok) {
+      form.reset();
+      say(`Thanks, ${d.name.split(' ')[0]}. Your quote request was sent and we'll be in touch soon. Need it sooner? Call ${PHONE}.`, 'ok');
+    } else if (out && out.error === 'validation') {
+      const el = form.elements[(out.fields || [])[0]];
+      if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); }
+      say(el && el.name === 'email' ? 'That email address doesn\'t look right. Fix it or leave it blank.' : 'Check the highlighted field and try again.', 'err');
+    } else if (out && out.error === 'too_many') {
+      say(`We've already received a few requests from you. Please call or text ${PHONE} instead.`, 'err');
+    } else if (!out) {
+      openEmailApp(); // no quote endpoint here (preview copy): use the visitor's email app
+    } else {
+      say(`Your request didn't go through. Please call or text ${PHONE}, or try again in a minute.`, 'err');
+    }
+  });
+
+  const year = $('#year');
+  if (year) year.textContent = new Date().getFullYear();
+})();
