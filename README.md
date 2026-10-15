@@ -49,16 +49,19 @@ Every **Get a free quote** button goes to the on-page quote form, and **Call 24/
 
 **Text a photo** opens the phone's messages app addressed to the business, which is the fastest way to see a yard before quoting.
 
-### Getting form submissions into the inbox
+### Where form submissions go
 
-Right now **Request my free quote** opens the visitor's own email app with the request already written out to Bealspf@gmail.com; they press send. That works with no setup, but some visitors don't have an email app set up.
+On the live site, **Request my free quote** posts to `api/quote.php` on Hostinger, which:
 
-For submissions to arrive by email with no extra step for the visitor, use **Web3Forms** (free):
+1. **Saves the request to MySQL first** (table `quote_requests`, created automatically), so a lead is never lost even if email is down.
+2. **Emails it to bealspf@gmail.com through Resend**, from `quotes@bealsprestigefence.com`. Replying to that email goes straight to the customer (when they gave an email).
+3. Sends the customer a short confirmation email, if they gave one.
 
-1. Go to https://web3forms.com, enter **Bealspf@gmail.com**, and copy the **access key** they email you.
-2. Open `assets/js/main.js` and paste it between the quotes on the `WEB3FORMS_KEY` line near the top.
+The visitor sees "sent" if either the save or the email worked. Inputs are validated and escaped, a hidden spam trap catches bots, and each visitor is limited to 5 requests per 10 minutes. Errors go to the server's PHP error log with a `[quote]` prefix; the visitor never sees technical details.
 
-That's it. A hidden spam trap field is already in the form.
+Where PHP isn't running (the GitHub preview, or opening `index.html` from disk), the form falls back to opening the visitor's email app with the request written out to Bealspf@gmail.com.
+
+Secrets (database password, Resend API key) live only in `api/config.php` **on the server**. It is never committed; `api/config.example.php` shows the format.
 
 ## Reviews
 
@@ -108,12 +111,41 @@ All 67 photos, converted from iPhone HEIC to JPG, are in `_src/photos/jpg/` on t
 
 All of these are tokens at the top of `assets/css/style.css`.
 
-## Before launch
+## Going live: https://bealsprestigefence.com (Hostinger)
 
-- **Remove the preview-only `noindex` line** near the top of `index.html` (marked `PREVIEW ONLY`), or search engines will ignore the site.
+**How it's built.** `main` is the source and the GitHub Pages preview (with `noindex`). The live site is the **`deploy` branch**, produced by:
+
+```bash
+bash tools/build-deploy.sh --push
+```
+
+The script copies only what the live site needs (`index.html`, `assets/`, `api/quote.php`, `.htaccess`, `robots.txt`, `sitemap.xml`), removes the preview `noindex` tag, adds the canonical URL, and refuses to build if a placeholder, the `noindex` tag, or a `config.php` would ship. Run it after every change, then deploy in Hostinger (or let the Git webhook do it).
+
+**One-time Hostinger setup** (Business plan, same account as the other client sites):
+
+1. **Domain:** register `bealsprestigefence.com` (it's in the Hostinger cart: 3 years, $39.99, renews at $19.99/yr).
+2. **Website:** Websites → Create site → empty PHP/HTML site on `bealsprestigefence.com`.
+3. **Git deploy:** Advanced → GIT → repository `https://github.com/cohen05heidt/Beal-s-Prestige-Fencing.git`, branch **`deploy`**, install path **empty** (empty = `public_html` itself). `public_html` must be empty first (delete Hostinger's default `default.php` if present).
+4. **Database:** Databases → Management → new MySQL database + user. Hostinger prefixes the names with the account id; note the database name, user and password.
+5. **`api/config.php`:** File Manager → `public_html/api/` → New file `config.php`, one line:
+   ```php
+   <?php return ['db_host'=>'localhost','db_name'=>'DB_NAME','db_user'=>'DB_USER','db_pass'=>'DB_PASSWORD','mail_to'=>'bealspf@gmail.com','mail_from'=>"Beal's Prestige Fencing <quotes@bealsprestigefence.com>",'resend_api_key'=>'RESEND_API_KEY','business_phone'=>'(770) 540-6190','salt'=>'ANY_RANDOM_TEXT'];
+   ```
+6. **Resend DNS** (domain already added in Resend, region us-east-1): in Hostinger's DNS zone for the domain add
+   | Type | Name | Value |
+   |---|---|---|
+   | TXT | `resend._domainkey` | `p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdctqx/m8A4U+NmXPFRSfH8fdfKbL5+9zWR5p+cZ/497Wa/yQwV4AcVkzfCi/FslDFP461LbwJJRxhpnRDVdt6TT7LaudfFCh3mr67L5gMsHn/Xgyr4DY95SKhb07NyiZBQjiEWbWsMw9IMuWR75lxw8eQkO7dqJ15Jm5tr3ulLQIDAQAB` |
+   | CNAME | `send` | `send.forge.rmta.net` |
+   | CNAME | `rsend` | `rsend.forge.rmta.net` |
+   | TXT | `_dmarc` | `v=DMARC1; p=none;` |
+
+   Then click **Verify DNS Records** in Resend. DKIM can take 5–30 minutes. Do not add Resend's "MX @" record; that is only for receiving mail.
+7. **Resend API key:** Resend → API keys → create a key with **Sending access** limited to `bealsprestigefence.com`; paste it into `config.php`.
+
+**After launch checks:** `https://bealsprestigefence.com/api/config.php` must return 403 or 404; submit a test quote and confirm it in Resend → Emails (check the `to` address); `http://` and `www.` must redirect to `https://bealsprestigefence.com/`.
+
+Also:
 - Paste the Google **Ask for reviews** link into the review button.
-- Optional: add the Web3Forms key so quote requests land straight in Bealspf@gmail.com.
-- Upload `index.html` and the `assets` folder to the site root. All paths are relative, so it also works from a sub-folder.
 - **Turn off the GitHub preview** once the real site is live: repo **Settings → Pages →** set the branch to **None** → Save.
 
 ## Editing content
@@ -133,6 +165,8 @@ assets/video/hero-wide.mp4     opening film, desktop and landscape (1600x900, 10
 assets/video/hero-portrait.mp4 opening film, phones and portrait tablets (1200x1080 wide centre cut)
 assets/img/                film posters (first and last frame), share card, logo mark
 assets/img/work/           project photos (full size + small cover per type)
+api/quote.php              quote form endpoint (MySQL + Resend); api/config.php is server-only
+tools/build-deploy.sh      builds the live copy and publishes the deploy branch
 preview-server.ps1         local preview server used by START-PREVIEW.bat
 _src/                      full-size Higgsfield originals (not uploaded, ignored by git)
 ```
