@@ -19,18 +19,29 @@
 
   /* ======================= Top bar ======================= */
   const nav = $('#nav');
-  const navToggle = $('#navToggle');
   const onScroll = () => nav.classList.toggle('is-solid', window.scrollY > 24);
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
-  const setMenu = (open) => {
-    nav.classList.toggle('is-open', open);
-    navToggle.setAttribute('aria-expanded', String(open));
+  // Highlight the tab for the section on screen, and keep it in view in the scrolling tab row
+  const tabs = $$('#navLinks a:not(.nav-links-quote)');
+  const sections = tabs.map((a) => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  let current = null;
+  const markTab = () => {
+    const line = nav.offsetHeight + window.innerHeight * 0.3;
+    let id = null;
+    sections.forEach((s) => { if (s.getBoundingClientRect().top <= line) id = s.id; });
+    if (id === current) return;
+    current = id;
+    tabs.forEach((a) => {
+      const on = a.getAttribute('href') === '#' + id;
+      if (on) { a.setAttribute('aria-current', 'true'); const row = a.parentElement; if (row.scrollWidth > row.clientWidth) row.scrollTo({ left: a.offsetLeft - (row.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' }); }
+      else a.removeAttribute('aria-current');
+    });
   };
-  navToggle.addEventListener('click', () => setMenu(!nav.classList.contains('is-open')));
-  $$('#navLinks a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
+  markTab();
+  window.addEventListener('scroll', markTab, { passive: true });
+  window.addEventListener('resize', markTab);
 
   /* ======================= Hero film ======================= */
   // The Higgsfield film loops: the fence builds, holds, then rewinds. The first time the
