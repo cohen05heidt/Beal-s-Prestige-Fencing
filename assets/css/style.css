@@ -374,6 +374,7 @@ p { margin: 0; }
 .e-steel { fill: #A3ACA6; stroke: #6E7772; stroke-width: .8; }
 .e-mesh { stroke: #7F8983; stroke-width: .75; fill: none; }
 .e-slat { fill: #C98545; }
+.e-iron-ring { fill: none; stroke: #1E2522; stroke-width: 1.3; }
 .e-wire { stroke: #6E7772; stroke-width: 1; }
 .e-dim { stroke: var(--green); stroke-width: 1.2; fill: none; }
 .e-dim-text { fill: var(--green); font: 600 11px var(--mono); letter-spacing: .02em; }

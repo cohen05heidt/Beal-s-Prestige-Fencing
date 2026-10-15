@@ -6,3 +6,9 @@ _src/
 *.zip
 Thumbs.db
 .DS_Store
+
+# Production build output (pushed to the deploy branch)
+dist/
+
+# Server-only secrets (created by hand in Hostinger File Manager)
+api/config.php

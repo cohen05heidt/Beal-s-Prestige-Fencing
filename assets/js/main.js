@@ -4,10 +4,10 @@
 
   // ---------------------------------------------------------------------------
   // Quote form delivery
-  // Paste a free Web3Forms access key here (https://web3forms.com, the key is emailed
-  // to the business inbox) and quote requests arrive by email without the visitor's
-  // email app. Left empty, "Request my free quote" opens the visitor's email app instead.
-  const WEB3FORMS_KEY = '';
+  // The form posts to api/quote.php on Hostinger, which saves the request and emails it
+  // through Resend. Where PHP isn't running (the GitHub preview, or opening the file
+  // directly) the form falls back to opening the visitor's email app.
+  const QUOTE_ENDPOINT = 'api/quote.php';
   const QUOTE_EMAIL = 'Bealspf@gmail.com';
   const PHONE = '(770) 540-6190';
   // ---------------------------------------------------------------------------
@@ -276,6 +276,27 @@
       return s + dimension(top, ft);
     },
 
+    wroughtiron(ft) {
+      const top = G - ft * S, x0 = 52, x1 = 298, pw = 7;
+      const posts = postsAt(x0, x1, 3, pw);
+      const r1 = top + 9, r2 = top + 21; // double top rail with rings between
+      let s = '';
+      for (let x = x0 + 6, i = 0; x < x1 - 4; x += 8, i++) {
+        if (posts.some((px) => x > px - 4 && x < px + pw + 2)) continue;
+        const cx = x + 1.1;
+        s += rect(x, top + 5, 2.2, G - top - 9, 'e-alu');
+        s += poly([[cx, top], [cx + 2.6, top + 5], [cx, top + 7.5], [cx - 2.6, top + 5]], 'e-alu');
+        if (i % 2 === 0) s += `<circle cx="${f(x + 5.1)}" cy="${f((r1 + r2) / 2 + 1.4)}" r="3.1" class="e-iron-ring"/>`;
+      }
+      [r1, r2, G - 13].forEach((y) => { s += rect(x0, y, x1 - x0, 2.8, 'e-alu'); });
+      posts.forEach((px) => {
+        s += rect(px, top + 1, pw, G - top - 1, 'e-alu');
+        s += rect(px - 1.5, top - 1, pw + 3, 2.6, 'e-alu');
+        s += `<circle cx="${f(px + pw / 2)}" cy="${f(top - 4.5)}" r="3.6" class="e-alu"/>`;
+      });
+      return s + dimension(top, ft);
+    },
+
     chainlink(ft) {
       const top = G - ft * S, x0 = 52, x1 = 298, id = `mesh${++uid}`;
       let s = `<defs><pattern id="${id}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="translate(${x0} ${f(top)})">` +
@@ -472,29 +493,42 @@
       `Approx. length: ${d.length || '-'}`, '', d.message || '',
     ].join('\n');
 
-    if (!WEB3FORMS_KEY) {
+    const openEmailApp = () => {
       window.location.href = `mailto:${QUOTE_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       say(`Your email app should open with the request filled in. Press send to finish. Nothing opened? Call or text ${PHONE}.`, 'ok');
-      return;
-    }
+    };
 
     const btn = $('button[type="submit"]', form);
     btn.disabled = true;
     say('Sending...', 'ok');
+    let res;
+    let out = null;
     try {
-      const res = await fetch('https://api.web3forms.com/submit', {
+      res = await fetch(QUOTE_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, from_name: 'Beal’s Prestige Fencing website', replyto: d.email || undefined, message: body }),
+        body: JSON.stringify(d),
       });
-      const out = await res.json();
-      if (!res.ok || !out.success) throw new Error(out.message || res.status);
-      form.reset();
-      say(`Thanks, ${d.name.split(' ')[0]}. Your quote request was sent and we'll be in touch soon. Need it sooner? Call ${PHONE}.`, 'ok');
+      out = await res.json().catch(() => null);
     } catch (err) {
-      say(`Your request didn't go through. Please call or text ${PHONE}, or try again in a minute.`, 'err');
+      res = null;
     } finally {
       btn.disabled = false;
+    }
+
+    if (out && out.ok) {
+      form.reset();
+      say(`Thanks, ${d.name.split(' ')[0]}. Your quote request was sent and we'll be in touch soon. Need it sooner? Call ${PHONE}.`, 'ok');
+    } else if (out && out.error === 'validation') {
+      const el = form.elements[(out.fields || [])[0]];
+      if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); }
+      say(el && el.name === 'email' ? 'That email address doesn\'t look right. Fix it or leave it blank.' : 'Check the highlighted field and try again.', 'err');
+    } else if (out && out.error === 'too_many') {
+      say(`We've already received a few requests from you. Please call or text ${PHONE} instead.`, 'err');
+    } else if (!out) {
+      openEmailApp(); // no quote endpoint here (preview copy): use the visitor's email app
+    } else {
+      say(`Your request didn't go through. Please call or text ${PHONE}, or try again in a minute.`, 'err');
     }
   });
 
